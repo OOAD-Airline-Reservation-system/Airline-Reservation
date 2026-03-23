@@ -1,6 +1,6 @@
 # Airline Reservation System
 
-[cite_start]This project is a robust, scalable **Airline Reservation System** built using **Java**[cite: 5]. [cite_start]It was developed as a part of the **UE23CS352B - Object Oriented Analysis & Design** course[cite: 1, 2]. [cite_start]The system focuses on Object-Oriented principles to manage flight schedules, passenger bookings, seat allocations, and payment processing[cite: 4, 12].
+This project is a robust, scalable **Airline Reservation System** built using **Java**[cite: 5]. [cite_start]It was developed as a part of the **UE23CS352B - Object Oriented Analysis & Design** course.The system focuses on Object-Oriented principles to manage flight schedules, passenger bookings, seat allocations, and payment processing.
 
 ---
 
