@@ -1,72 +1,82 @@
 # Airline Reservation System
 
-This project is a robust, scalable **Airline Reservation System** built using **Java**[cite: 5]. [cite_start]It was developed as a part of the **UE23CS352B - Object Oriented Analysis & Design** course.The system focuses on Object-Oriented principles to manage flight schedules, passenger bookings, seat allocations, and payment processing.
+A robust, scalable Airline Reservation System built using Java, developed as part of the **UE23CS352B - Object Oriented Analysis & Design** course. The system applies Object-Oriented principles to manage flight schedules, passenger bookings, seat allocations, and payment processing.
 
 ---
 
 ## Project Overview
 
-[cite_start]The primary goal of this system is to ensure efficient management of flights, users, and transactions while maintaining accurate records and minimizing manual effort[cite: 12]. [cite_start]The implementation follows the **Model-View-Controller (MVC)** architectural pattern[cite: 27, 33].
+The primary goal of this system is to ensure efficient management of flights, users, and transactions while maintaining accurate records and minimizing manual effort. The implementation follows the **Model-View-Controller (MVC)** architectural pattern.
 
 ### Core Features
-[cite_start]As per the project guidelines, the system implements at least 4 major and 4 minor features[cite: 30]:
-* **Flight Management:** Adding, updating, and removing flight schedules.
-* **Booking System:** Handling real-time seat allocations and reservations.
-* [cite_start]**User Roles:** Specific functionalities for Members, Crew/Librarians, and Administrators[cite: 13, 14, 21].
-* [cite_start]**Payment & Fines:** Processing transactions and calculating applicable fees[cite: 20].
+
+The system implements 4 major and 4 minor features:
+
+- **Flight Management:** Adding, updating, and removing flight schedules.
+- **Booking System:** Handling real-time seat allocations and reservations.
+- **User Roles:** Dedicated functionalities for Members, Crew, and Administrators.
+- **Payment & Fees:** Processing transactions and calculating applicable charges.
 
 ---
 
 ## Design and Architecture
 
 ### UML Diagrams
-[cite_start]The project is modeled using various UML diagrams to ensure a structured approach to development[cite: 4, 27]:
-* [cite_start]**Use Case Diagrams:** To define the interactions between users and the system[cite: 27].
-* [cite_start]**Class Diagrams:** To represent the system structure and object relationships[cite: 27].
-* [cite_start]**Activity Diagrams:** To map the workflows of major features[cite: 27].
-* [cite_start]**State Diagrams:** To track the status changes of entities like bookings[cite: 27].
+
+The project is modeled using the following UML diagrams to ensure a structured approach to development:
+
+- **Use Case Diagrams:** Define interactions between users and the system.
+- **Class Diagrams:** Represent system structure and object relationships.
+- **Activity Diagrams:** Map the workflows of major features.
+- **State Diagrams:** Track status changes of entities such as bookings.
 
 ### Design Principles and Patterns
-[cite_start]The implementation incorporates **4 design principles** and **4 design patterns** (Creational, Structural, and Behavioral) to ensure code quality and maintainability[cite: 28, 42].
+
+The implementation incorporates 4 design principles and 4 design patterns spanning Creational, Structural, and Behavioral categories to ensure code quality and maintainability.
 
 ---
 
 ## Technical Specifications
 
-* [cite_start]**Language:** Java [cite: 5]
-* [cite_start]**Framework:** Java Spring Framework (MVC) [cite: 33]
-* [cite_start]**Frontend:** Java Swing or JavaFX (Optional) [cite: 33]
-* [cite_start]**Database:** Persistent storage using a database of choice [cite: 37]
-* [cite_start]**Type:** Desktop or Web Application [cite: 34]
+| Property | Details |
+| :--- | :--- |
+| Language | Java |
+| Framework | Spring Framework (MVC) |
+| Frontend | Java Swing / JavaFX |
+| Database | Persistent storage (configurable) |
+| Application Type | Desktop or Web Application |
 
 ---
 
 ## Team Contributions
 
-[cite_start]Each team member is responsible for the full lifecycle of a specific use case, including the UI, business logic, and backend implementation[cite: 35].
+Each team member is responsible for the full lifecycle of a specific use case, including the UI, business logic, and backend implementation.
 
-| Member | Use Case (Major) | Use Case (Minor) |
+| Member | Major Use Case | Minor Use Case |
 | :--- | :--- | :--- |
-| Member 1 | [Feature Name] | [Feature Name] |
-| Member 2 | [Feature Name] | [Feature Name] |
-| Member 3 | [Feature Name] | [Feature Name] |
-| Member 4 | [Feature Name] | [Feature Name] |
+| Member 1 | | |
+| Member 2 | | |
+| Member 3 | | |
+| Member 4 | | |
 
 ---
 
 ## Installation and Setup
 
-1.  **Clone the Repository:**
-    ```bash
-    git clone [Your GitHub Link]
-    ```
-2.  [cite_start]**Database Configuration:** Ensure your database is running and update the connection strings in the configuration files[cite: 37].
-3.  [cite_start]**Build and Run:** Use a Java IDE or build tool (like Maven/Gradle) to compile and execute the application[cite: 33].
+1. **Clone the repository:**
+```bash
+   git clone <your-github-link>
+```
+
+2. **Configure the database:** Ensure your database is running and update the connection strings in the configuration files.
+
+3. **Build and run:** Use a Java IDE or build tool (Maven or Gradle) to compile and execute the application.
 
 ---
 
 ## Submission Deliverables
-* [cite_start]Detailed Problem Statement [cite: 40]
-* [cite_start]UML Models (Use Case, Class, Activity, State) [cite: 41]
-* [cite_start]Descriptions of Design Patterns and Principles applied [cite: 42]
-* [cite_start]Screenshots of the functioning application with a white background [cite: 45]
+
+- Detailed Problem Statement
+- UML Models (Use Case, Class, Activity, State)
+- Descriptions of Design Patterns and Principles applied
+- Screenshots of the functioning application with a white background
