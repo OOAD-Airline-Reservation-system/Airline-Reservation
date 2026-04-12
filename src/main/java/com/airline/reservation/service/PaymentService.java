@@ -9,14 +9,12 @@ import com.airline.reservation.entity.PaymentStatus;
 import com.airline.reservation.entity.Seat;
 import com.airline.reservation.entity.SeatStatus;
 import com.airline.reservation.exception.BadRequestException;
+import com.airline.reservation.factory.PaymentFactory;
 import com.airline.reservation.repository.BookingRepository;
 import com.airline.reservation.repository.PaymentRepository;
 import com.airline.reservation.repository.SeatRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.time.LocalDateTime;
-import java.util.UUID;
 
 @Service
 public class PaymentService {
@@ -25,17 +23,20 @@ public class PaymentService {
     private final BookingService bookingService;
     private final BookingRepository bookingRepository;
     private final SeatRepository seatRepository;
+    private final PaymentFactory paymentFactory;
 
     public PaymentService(
             PaymentRepository paymentRepository,
             BookingService bookingService,
             BookingRepository bookingRepository,
-            SeatRepository seatRepository
+            SeatRepository seatRepository,
+            PaymentFactory paymentFactory
     ) {
         this.paymentRepository = paymentRepository;
         this.bookingService = bookingService;
         this.bookingRepository = bookingRepository;
         this.seatRepository = seatRepository;
+        this.paymentFactory = paymentFactory;
     }
 
     @Transactional
@@ -54,13 +55,7 @@ public class PaymentService {
 
         boolean paymentSucceeded = !request.getPaymentToken().isBlank();
 
-        Payment payment = new Payment();
-        payment.setBooking(booking);
-        payment.setAmount(booking.getTotalAmount());
-        payment.setProvider(request.getProvider());
-        payment.setTransactionId(UUID.randomUUID().toString());
-        payment.setProcessedAt(LocalDateTime.now());
-        payment.setStatus(paymentSucceeded ? PaymentStatus.SUCCESS : PaymentStatus.FAILED);
+        Payment payment = paymentFactory.create(booking, request.getProvider(), paymentSucceeded);
 
         if (paymentSucceeded) {
             booking.setStatus(BookingStatus.CONFIRMED);

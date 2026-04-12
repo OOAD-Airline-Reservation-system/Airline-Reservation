@@ -3,23 +3,19 @@ package com.airline.reservation.service;
 import com.airline.reservation.dto.booking.BookingResponse;
 import com.airline.reservation.dto.booking.CreateBookingRequest;
 import com.airline.reservation.entity.Booking;
-import com.airline.reservation.entity.BookingStatus;
-import com.airline.reservation.entity.PaymentStatus;
 import com.airline.reservation.entity.Seat;
 import com.airline.reservation.entity.SeatStatus;
 import com.airline.reservation.entity.User;
 import com.airline.reservation.exception.BadRequestException;
 import com.airline.reservation.exception.ResourceNotFoundException;
+import com.airline.reservation.factory.BookingFactory;
 import com.airline.reservation.repository.BookingRepository;
 import com.airline.reservation.repository.SeatRepository;
 import com.airline.reservation.repository.UserRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.math.BigDecimal;
-import java.time.LocalDateTime;
 import java.util.List;
-import java.util.UUID;
 
 @Service
 public class BookingService {
@@ -28,17 +24,20 @@ public class BookingService {
     private final SeatRepository seatRepository;
     private final FlightService flightService;
     private final UserRepository userRepository;
+    private final BookingFactory bookingFactory;
 
     public BookingService(
             BookingRepository bookingRepository,
             SeatRepository seatRepository,
             FlightService flightService,
-            UserRepository userRepository
+            UserRepository userRepository,
+            BookingFactory bookingFactory
     ) {
         this.bookingRepository = bookingRepository;
         this.seatRepository = seatRepository;
         this.flightService = flightService;
         this.userRepository = userRepository;
+        this.bookingFactory = bookingFactory;
     }
 
     @Transactional
@@ -62,14 +61,7 @@ public class BookingService {
             throw new BadRequestException("One or more seats are no longer available");
         }
 
-        Booking booking = new Booking();
-        booking.setBookingReference("BK-" + UUID.randomUUID().toString().substring(0, 8).toUpperCase());
-        booking.setUser(user);
-        booking.setFlight(flight);
-        booking.setStatus(BookingStatus.PENDING_PAYMENT);
-        booking.setPaymentStatus(PaymentStatus.PENDING);
-        booking.setBookedAt(LocalDateTime.now());
-        booking.setTotalAmount(seats.stream().map(Seat::getPrice).reduce(BigDecimal.ZERO, BigDecimal::add));
+        Booking booking = bookingFactory.create(user, flight, seats);
         bookingRepository.save(booking);
 
         for (Seat seat : seats) {
