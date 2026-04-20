@@ -17,7 +17,7 @@
 11. [Booking Workflow](#11-booking-workflow)
 12. [Loyalty Programme](#12-loyalty-programme)
 13. [Available Routes](#13-available-routes)
-14. [Available Routes](#14-Steps-to-execute)
+14. [Steps to Execute](#14-Steps-to-execute)
 
 ---
 
