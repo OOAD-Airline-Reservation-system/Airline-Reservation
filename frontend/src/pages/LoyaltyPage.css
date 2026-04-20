@@ -1,0 +1,204 @@
+.lp-page {
+  padding-top: 40px;
+  padding-bottom: 80px;
+}
+
+/* ── Hero card ── */
+.lp-hero {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 28px;
+  margin-bottom: 24px;
+  padding: 28px;
+}
+
+.lp-hero-left { flex: 1 1 280px; }
+.lp-hero-right { flex: 1 1 240px; display: flex; flex-direction: column; justify-content: center; }
+
+.lp-tier-badge {
+  display: inline-block;
+  padding: 6px 18px;
+  border-radius: 999px;
+  color: #fff;
+  font-weight: 700;
+  font-size: 1rem;
+  margin-bottom: 8px;
+  letter-spacing: 0.06em;
+}
+
+.lp-membership {
+  font-size: 0.8rem;
+  color: var(--color-text-muted, #6b7280);
+  margin-bottom: 20px;
+  letter-spacing: 0.08em;
+}
+
+.lp-points-row {
+  display: flex;
+  gap: 24px;
+  flex-wrap: wrap;
+}
+
+.lp-points-block {
+  display: flex;
+  flex-direction: column;
+}
+
+.lp-points-num {
+  font-size: 1.6rem;
+  font-weight: 700;
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+}
+
+.lp-points-label {
+  font-size: 0.72rem;
+  color: var(--color-text-muted, #6b7280);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin-top: 2px;
+}
+
+.lp-next-tier-label {
+  font-size: 0.85rem;
+  font-weight: 600;
+  margin-bottom: 10px;
+  color: var(--color-text-muted, #6b7280);
+}
+
+.lp-progress-bar {
+  width: 100%;
+  height: 8px;
+  border-radius: 999px;
+  background: var(--color-border, #e5e7eb);
+  overflow: hidden;
+  margin-bottom: 12px;
+}
+
+.lp-progress-fill {
+  height: 100%;
+  border-radius: 999px;
+  transition: width 0.6s ease;
+}
+
+.lp-tier-ladder {
+  display: flex;
+  gap: 16px;
+  font-size: 1.3rem;
+}
+
+.lp-tier-step { opacity: 0.35; }
+.lp-tier-step.active { opacity: 1; transform: scale(1.2); }
+
+/* ── Tabs ── */
+.lp-tabs {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+}
+
+.lp-tab {
+  padding: 10px 20px;
+  border-radius: 8px;
+  border: 1.5px solid var(--color-border, #e5e7eb);
+  background: transparent;
+  cursor: pointer;
+  font-size: 0.9rem;
+  font-weight: 500;
+  transition: all 0.15s;
+  color: var(--color-text, #111);
+}
+
+.lp-tab.active {
+  border-color: var(--color-primary, #2563eb);
+  background: color-mix(in srgb, var(--color-primary, #2563eb) 8%, transparent);
+  color: var(--color-primary, #2563eb);
+}
+
+/* ── Sections ── */
+.lp-section { padding: 24px; }
+
+.lp-section-title {
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin-bottom: 16px;
+}
+
+.lp-perks-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.lp-perk-item {
+  font-size: 0.9rem;
+  color: var(--color-text, #111);
+  padding: 8px 12px;
+  border-radius: 6px;
+  background: var(--color-surface-2, #f9fafb);
+}
+
+.lp-earn-info { padding: 16px 20px; border-radius: 10px; }
+.lp-earn-title { font-weight: 600; margin-bottom: 8px; }
+.lp-earn-text  { font-size: 0.875rem; margin-bottom: 4px; color: var(--color-text-muted, #374151); }
+
+/* ── Redeem form ── */
+.lp-redeem-form {
+  display: flex;
+  align-items: flex-end;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.lp-redeem-equiv {
+  font-size: 0.85rem;
+  color: var(--color-text-muted, #6b7280);
+  min-width: 160px;
+  padding-bottom: 10px;
+}
+
+.lp-redeem-note {
+  font-size: 0.78rem;
+  color: var(--color-text-muted, #6b7280);
+  margin-top: 16px;
+  font-style: italic;
+}
+
+/* ── History table ── */
+.lp-tx-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.875rem;
+}
+
+.lp-tx-table th {
+  text-align: left;
+  padding: 8px 10px;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--color-text-muted, #6b7280);
+  border-bottom: 1px solid var(--color-border, #e5e7eb);
+}
+
+.lp-tx-table td {
+  padding: 10px;
+  border-bottom: 1px solid var(--color-border, #f3f4f6);
+}
+
+.lp-earn  { color: #16a34a; font-weight: 600; }
+.lp-spend { color: #dc2626; font-weight: 600; }
+.lp-empty { color: var(--color-text-muted, #6b7280); font-size: 0.9rem; }
+
+.alert-success {
+  background: #dcfce7;
+  border: 1px solid #86efac;
+  color: #166534;
+  padding: 12px 16px;
+  border-radius: 8px;
+  font-size: 0.875rem;
+}
