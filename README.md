@@ -21,6 +21,7 @@
 11. [Booking Workflow](#11-booking-workflow)
 12. [Loyalty Programme](#12-loyalty-programme)
 13. [Available Routes](#13-available-routes)
+14. [Available Routes](#14-Steps-to-execute)
 
 ---
 
@@ -173,6 +174,18 @@ Both complete implementations are preserved as commented code in `AeroDataBoxCli
 ## 6. Object-Oriented Design
 
 ### GRASP Principles
+
+| Principle | Application in This System |
+| --- | --- |
+| **Information Expert** | `LoyaltyAccount` owns all tier and point arithmetic logic. Methods `addPoints()`, `redeemPoints()`, and `recalculateTier()` live on the entity because it holds all the data needed to perform them — no other class needs to reach in and compute loyalty state. |
+| **Creator** | `DefaultBookingFactory` creates `Booking` instances; `DefaultPaymentFactory` creates `Payment` instances. Both implement their respective factory interfaces, centralising and standardising object construction so that initialisation logic is never duplicated across service classes. |
+| **Controller** | All `*Controller` classes act purely as HTTP routing delegates. They extract request parameters, forward work to the appropriate service, and map the result to a response. No business logic exists in any controller — they are thin entry points only. |
+| **Pure Fabrication** | All `*Repository` classes are pure fabrications — they represent no concept in the airline domain. Their sole responsibility is Firestore data access, including serialisation to `Map<String, Object>` for writes and deserialisation from `DocumentSnapshot` for reads, keeping persistence concerns entirely separate from domain logic. |
+| **Low Coupling** | Service classes depend on repository interfaces and gateway interfaces, not on Firestore or any external API client directly. The persistence and integration layers can be swapped (e.g. Firestore → PostgreSQL, Razorpay → Stripe) without touching business logic. |
+| **High Cohesion** | Each service class has one clearly bounded responsibility: `LoyaltyService` handles only loyalty logic, `SeatService` handles only seat retrieval, `FlightTrackingService` handles only status derivation. No service mixes unrelated concerns. |
+| **Polymorphism** | The `PaymentGatewayAdapter` interface is satisfied by `RazorpayGatewayAdapter`. The `FlightTrackingClient` interface is satisfied by `AviationstackClient`. New providers are introduced by adding implementations, not by modifying existing code — behaviour varies through polymorphic dispatch. |
+| **Indirection** | `GeminiService` and `FlightTrackingService` never call external HTTP endpoints directly. They go through gateway interfaces (`FlightTrackingClient`, Gemini REST adapter), placing an indirection layer between the business logic and the volatile external world. |
+| **Protected Variations** | External API instability (rate limits, schema changes, deprecated endpoints) is isolated behind gateway interfaces. The rest of the system is shielded: if Aviationstack changes its response format, only `AviationstackClient` needs updating. The same pattern protects the payment flow via `PaymentGatewayAdapter`. |
 
 **Information Expert**
 The `LoyaltyAccount` entity owns all tier calculation and point arithmetic logic. Methods such as `addPoints()`, `redeemPoints()`, and `recalculateTier()` are defined directly on the entity because it holds all the information required to perform these operations.
@@ -562,3 +575,192 @@ The following routes are available for search and booking. All routes operate in
 | BOM | HKG | Cathay Pacific, Air India |
 | DEL | SYD | Qantas, Air India |
 | BOM | JFK | Air India |
+
+ ## 14. Steps to execute
+ 
+This section covers every prerequisite and configuration step needed to get both the backend and frontend running locally from scratch, including Firebase setup and all external API keys.
+ 
+### Prerequisites
+ 
+Make sure the following are installed on your machine before proceeding:
+ 
+| Tool | Version | Download |
+| --- | --- | --- |
+| Java JDK | 17 or higher | https://adoptium.net |
+| Apache Maven | 3.x | https://maven.apache.org/download.cgi |
+| Node.js + npm | 18 or higher | https://nodejs.org |
+| Git | Any | https://git-scm.com |
+ 
+---
+ 
+### Step 1 — Clone the Repository
+ 
+```bash
+git clone https://github.com/OOAD-Airline-Reservation-system/Airline-Reservation.git
+cd Airline-Reservation
+```
+ 
+---
+ 
+### Step 2 — Set Up Firebase
+ 
+Firebase Firestore is the primary database for this project. All users, flights, bookings, seats, payments, and loyalty data are stored here.
+ 
+#### 2a. Create a Firebase Project
+ 
+1. Go to [https://console.firebase.google.com](https://console.firebase.google.com) and click **Add project**.
+2. Give your project a name (e.g. `airline-reservation-ars`) and click through to create it.
+3. Once created, navigate to **Build → Firestore Database** in the left sidebar.
+4. Click **Create database**, choose **Start in production mode** (the backend handles all writes), and select any region (e.g. `asia-south1` for India).
+#### 2b. Generate a Service Account Key (Backend)
+ 
+1. In the Firebase Console, go to **Project Settings** (gear icon) → **Service accounts**.
+2. Click **Generate new private key** and confirm. A JSON file will be downloaded — this is your `firebase-adminsdk.json`.
+3. Copy this file into `backend/src/main/resources/` and rename it `firebase-adminsdk.json`.
+> **Security:** This file contains a private key. Never commit it to version control. It is already listed in `.gitignore`.
+ 
+#### 2c. Get the Web SDK Config (Frontend)
+ 
+1. In **Project Settings** → **General**, scroll to **Your apps** and click **Add app → Web**.
+2. Register the app (any nickname). Firebase will show you a config object like this:
+```javascript
+const firebaseConfig = {
+  apiKey: "AIza...",
+  authDomain: "your-project.firebaseapp.com",
+  projectId: "your-project-id",
+  storageBucket: "your-project.appspot.com",
+  messagingSenderId: "1234567890",
+  appId: "1:1234567890:web:abc123"
+};
+```
+ 
+3. Open `frontend/src/firebase/firebaseConfig.js` and paste these values in.
+---
+ 
+### Step 3 — Obtain API Keys
+ 
+#### Aviationstack (Flight Tracking)
+ 
+- Sign up at [https://aviationstack.com](https://aviationstack.com).
+- The free plan provides **500 requests/month**, which is sufficient for development.
+- After registration, copy your **Access Key** from the dashboard.
+#### Google Gemini (AI Trip Suggestions)
+ 
+- Go to [https://aistudio.google.com/app/apikey](https://aistudio.google.com/app/apikey) and sign in with a Google account.
+- Click **Create API key** and copy it. The free tier has generous quota for development use.
+#### Razorpay (Payment Gateway — Optional)
+ 
+- The system runs in **demo mode by default**. No Razorpay credentials are required to test the full payment flow — any non-blank payment token is accepted.
+- If you want to enable real payment verification, sign up at [https://razorpay.com](https://razorpay.com), go to **Settings → API Keys**, generate a key pair, and fill in `key-id` and `key-secret` in `application.yml`.
+---
+ 
+### Step 4 — Configure the Backend
+ 
+Open `backend/src/main/resources/application.yml` and fill in all values:
+ 
+```yaml
+app:
+  jwt:
+    # Generate a secure random Base64-encoded 256-bit secret, e.g. via:
+    #   openssl rand -base64 32
+    secret: "your-base64-encoded-256-bit-secret"
+    expiration-ms: 3600000   # 1 hour; adjust as needed
+ 
+  firebase:
+    service-account-key: "classpath:firebase-adminsdk.json"
+    project-id: "your-firebase-project-id"   # From Firebase Console → Project Settings
+ 
+  aviationstack:
+    api-key: "your-aviationstack-access-key"
+    base-url: "http://api.aviationstack.com/v1"
+ 
+  gemini:
+    api-key: "your-gemini-api-key"
+ 
+  razorpay:
+    key-id: ""       # Leave blank for demo mode
+    key-secret: ""   # Leave blank for demo mode
+ 
+  aerodatabox:
+    api-key: ""      # Optional — only required if enabling AeroDataBox (see Section 5)
+    api-host: "aerodatabox.p.rapidapi.com"
+```
+ 
+> **Tip:** To generate a JWT secret, run `openssl rand -base64 32` in your terminal and paste the output as the value.
+ 
+---
+ 
+### Step 5 — Start the Backend
+ 
+```bash
+cd backend
+mvn spring-boot:run
+```
+ 
+Maven will download all dependencies on the first run. Once you see a log line like:
+ 
+```
+Started AirlineReservationApplication in X.XXX seconds
+```
+ 
+the backend is running at **http://localhost:8080**. On first startup, `DataInitializer` seeds the Firestore database with the static flight route table automatically.
+ 
+---
+ 
+### Step 6 — Configure and Start the Frontend
+ 
+#### Install Dependencies
+ 
+```bash
+cd ../frontend
+npm install
+```
+ 
+#### Environment File
+ 
+Create a file called `.env.local` inside the `frontend/` directory with the following content. These values are only used for the Firebase client SDK (for any direct Firestore operations from the browser, if applicable):
+ 
+```env
+VITE_FIREBASE_API_KEY=your-firebase-api-key
+VITE_FIREBASE_AUTH_DOMAIN=your-project.firebaseapp.com
+VITE_FIREBASE_PROJECT_ID=your-firebase-project-id
+VITE_FIREBASE_STORAGE_BUCKET=your-project.appspot.com
+VITE_FIREBASE_MESSAGING_SENDER_ID=your-sender-id
+VITE_FIREBASE_APP_ID=your-app-id
+```
+ 
+These values come from the Firebase Web SDK config object you obtained in Step 2c.
+ 
+#### Start the Dev Server
+ 
+```bash
+npm run dev
+```
+ 
+The frontend will start at **http://localhost:5173**.
+ 
+The `vite.config.js` file already contains a proxy rule that forwards all `/api/*` and `/auth/*` requests to `http://localhost:8080`, so no CORS configuration is needed during development.
+ 
+---
+ 
+### Step 7 — Verify Everything is Working
+ 
+1. Open [http://localhost:5173](http://localhost:5173) in your browser.
+2. Click **Register** and create a new account — this creates a user document in Firestore and auto-enrols the user in the loyalty programme.
+3. Log in and use the flight search with any route from the [Available Routes](#13-available-routes) table (e.g. `DEL → BOM`, date: any future date).
+4. Complete a booking end-to-end: search → seat selection → confirm → passenger details → payment (enter any non-blank value as the payment token in demo mode) → success.
+5. Check **My Bookings** and **Loyalty** pages to confirm data was persisted correctly.
+---
+ 
+### Troubleshooting
+ 
+| Issue | Likely Cause | Fix |
+| --- | --- | --- |
+| Backend fails to start with Firebase error | `firebase-adminsdk.json` missing or wrong project ID in `application.yml` | Verify the file is in `src/main/resources/` and the `project-id` field matches your Firebase project |
+| `401 Unauthorized` on all API calls | JWT secret not set or token expired | Set a valid secret in `application.yml`; re-login to get a fresh token |
+| Flight tracking returns no data | Aviationstack key missing or free quota exhausted | Add your API key to `application.yml`; the system will fall back to schedule-derived status automatically |
+| Gemini suggestions fail | Gemini API key missing or quota exceeded | Add your key to `application.yml`; check quota at [aistudio.google.com](https://aistudio.google.com) |
+| Frontend cannot reach backend | Backend not running or wrong port | Ensure backend is running on port 8080 before starting the frontend |
+| `npm install` fails | Node.js version below 18 | Upgrade Node.js at https://nodejs.org |
+ 
+---
