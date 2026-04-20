@@ -175,18 +175,6 @@ Both complete implementations are preserved as commented code in `AeroDataBoxCli
 
 ### GRASP Principles
 
-| Principle | Application in This System |
-| --- | --- |
-| **Information Expert** | `LoyaltyAccount` owns all tier and point arithmetic logic. Methods `addPoints()`, `redeemPoints()`, and `recalculateTier()` live on the entity because it holds all the data needed to perform them — no other class needs to reach in and compute loyalty state. |
-| **Creator** | `DefaultBookingFactory` creates `Booking` instances; `DefaultPaymentFactory` creates `Payment` instances. Both implement their respective factory interfaces, centralising and standardising object construction so that initialisation logic is never duplicated across service classes. |
-| **Controller** | All `*Controller` classes act purely as HTTP routing delegates. They extract request parameters, forward work to the appropriate service, and map the result to a response. No business logic exists in any controller — they are thin entry points only. |
-| **Pure Fabrication** | All `*Repository` classes are pure fabrications — they represent no concept in the airline domain. Their sole responsibility is Firestore data access, including serialisation to `Map<String, Object>` for writes and deserialisation from `DocumentSnapshot` for reads, keeping persistence concerns entirely separate from domain logic. |
-| **Low Coupling** | Service classes depend on repository interfaces and gateway interfaces, not on Firestore or any external API client directly. The persistence and integration layers can be swapped (e.g. Firestore → PostgreSQL, Razorpay → Stripe) without touching business logic. |
-| **High Cohesion** | Each service class has one clearly bounded responsibility: `LoyaltyService` handles only loyalty logic, `SeatService` handles only seat retrieval, `FlightTrackingService` handles only status derivation. No service mixes unrelated concerns. |
-| **Polymorphism** | The `PaymentGatewayAdapter` interface is satisfied by `RazorpayGatewayAdapter`. The `FlightTrackingClient` interface is satisfied by `AviationstackClient`. New providers are introduced by adding implementations, not by modifying existing code — behaviour varies through polymorphic dispatch. |
-| **Indirection** | `GeminiService` and `FlightTrackingService` never call external HTTP endpoints directly. They go through gateway interfaces (`FlightTrackingClient`, Gemini REST adapter), placing an indirection layer between the business logic and the volatile external world. |
-| **Protected Variations** | External API instability (rate limits, schema changes, deprecated endpoints) is isolated behind gateway interfaces. The rest of the system is shielded: if Aviationstack changes its response format, only `AviationstackClient` needs updating. The same pattern protects the payment flow via `PaymentGatewayAdapter`. |
-
 **Information Expert**
 The `LoyaltyAccount` entity owns all tier calculation and point arithmetic logic. Methods such as `addPoints()`, `redeemPoints()`, and `recalculateTier()` are defined directly on the entity because it holds all the information required to perform these operations.
 
