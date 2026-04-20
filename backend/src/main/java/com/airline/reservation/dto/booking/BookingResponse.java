@@ -1,6 +1,7 @@
 package com.airline.reservation.dto.booking;
 
 import com.airline.reservation.entity.BookingStatus;
+import com.airline.reservation.entity.BookingStep;
 import com.airline.reservation.entity.PaymentStatus;
 
 import java.math.BigDecimal;
@@ -18,6 +19,7 @@ public class BookingResponse {
     private BigDecimal totalAmount;
     private LocalDateTime bookedAt;
     private List<String> seats;
+    private BookingStep bookingStep;
 
     public String getId() { return id; }
     public void setId(String id) { this.id = id; }
@@ -45,4 +47,7 @@ public class BookingResponse {
 
     public List<String> getSeats() { return seats; }
     public void setSeats(List<String> seats) { this.seats = seats; }
+
+    public BookingStep getBookingStep() { return bookingStep; }
+    public void setBookingStep(BookingStep bookingStep) { this.bookingStep = bookingStep; }
 }

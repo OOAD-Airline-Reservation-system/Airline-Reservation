@@ -26,7 +26,8 @@ export const auth = {
 };
 
 export const flights = {
-  search: (params) => api.get('/api/flights/search', { params }),
+  search:    (params) => api.get('/api/flights/search', { params }),
+  getById:   (id)     => api.get(`/api/flights/${id}`),
 };
 
 export const seats = {
@@ -37,6 +38,7 @@ export const bookings = {
   create:  (data) => api.post('/api/bookings', data),
   getOne:  (id)   => api.get(`/api/bookings/${id}`),
   getMine: ()     => api.get('/api/bookings/me'),
+  cancel:  (id)   => api.delete(`/api/bookings/${id}`),
 };
 
 export const passengers = {

@@ -2,6 +2,7 @@ package com.airline.reservation.repository;
 
 import com.airline.reservation.entity.Booking;
 import com.airline.reservation.entity.BookingStatus;
+import com.airline.reservation.entity.BookingStep;
 import com.airline.reservation.entity.PaymentStatus;
 import com.google.cloud.firestore.DocumentSnapshot;
 import com.google.cloud.firestore.Firestore;
@@ -96,6 +97,8 @@ public class BookingRepository {
             b.setSeatIds(list.stream().map(Object::toString).collect(Collectors.toList()));
         }
         b.setPaymentId(doc.getString("paymentId"));
+        String step = doc.getString("bookingStep");
+        if (step != null) b.setBookingStep(BookingStep.valueOf(step));
         return b;
     }
 
@@ -114,6 +117,7 @@ public class BookingRepository {
         m.put("bookedAt", b.getBookedAt().toString());
         m.put("seatIds", b.getSeatIds() != null ? b.getSeatIds() : new ArrayList<>());
         m.put("paymentId", b.getPaymentId());
+        m.put("bookingStep", b.getBookingStep() != null ? b.getBookingStep().name() : null);
         return m;
     }
 }

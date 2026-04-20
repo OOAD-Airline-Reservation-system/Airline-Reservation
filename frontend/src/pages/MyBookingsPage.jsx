@@ -9,7 +9,7 @@ const statusClass = (status) => {
   if (!status) return '';
   const s = status.toLowerCase();
   if (s === 'confirmed') return 'badge-confirmed';
-  if (s === 'pending') return 'badge-pending';
+  if (s === 'pending_payment') return 'badge-pending';
   if (s === 'cancelled') return 'badge-cancelled';
   return '';
 };
@@ -21,6 +21,24 @@ const paymentClass = (status) => {
   if (s === 'pending') return 'badge-pending';
   return '';
 };
+
+const STEPS = ['Seats selected', 'Passenger details', 'Payment'];
+const stepIndex = (bookingStep) => bookingStep === 'PASSENGERS_SAVED' ? 1 : 0;
+
+function StepTracker({ bookingStep }) {
+  const current = stepIndex(bookingStep);
+  return (
+    <div className="step-tracker">
+      {STEPS.map((label, i) => (
+        <div key={i} className={`step-item ${i < current ? 'step-done' : i === current ? 'step-current' : 'step-todo'}`}>
+          <div className="step-dot">{i < current ? '✓' : i + 1}</div>
+          <span className="step-label">{label}</span>
+          {i < STEPS.length - 1 && <div className="step-line" />}
+        </div>
+      ))}
+    </div>
+  );
+}
 
 export default function MyBookingsPage() {
   const navigate = useNavigate();
@@ -40,6 +58,9 @@ export default function MyBookingsPage() {
       }
     })();
   }, []);
+
+  const pending   = myBookings.filter(b => b.status === 'PENDING_PAYMENT');
+  const completed = myBookings.filter(b => b.status === 'CONFIRMED' || b.status === 'CANCELLED');
 
   return (
     <div className="page-container" style={{ paddingBottom: 60 }}>
@@ -61,45 +82,91 @@ export default function MyBookingsPage() {
         </div>
       )}
 
-      {!loading && myBookings.length > 0 && (
-        <div className="bookings-list">
-          {myBookings.map((b, i) => (
-            <div key={b.id} className="booking-row card fade-up" style={{ animationDelay: `${i * 0.04}s` }}>
-              <div className="booking-row-main">
-                <div className="booking-ref-block">
-                  <span className="booking-ref">{b.bookingReference}</span>
-                  <span className="booking-flight">{b.flightNumber}</span>
+      {/* In Progress */}
+      {!loading && pending.length > 0 && (
+        <>
+          <p className="section-label">In progress</p>
+          <div className="bookings-list" style={{ marginBottom: 32 }}>
+            {pending.map((b, i) => (
+              <div
+                key={b.id}
+                className="booking-row card fade-up"
+                style={{ animationDelay: `${i * 0.04}s`, cursor: 'pointer', flexDirection: 'column', alignItems: 'stretch', gap: 16 }}
+                onClick={() => navigate(`/my-bookings/${b.id}`)}
+              >
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <div className="booking-ref-block">
+                    <span className="booking-ref">{b.bookingReference}</span>
+                    <span className="booking-flight">{b.flightNumber}</span>
+                  </div>
+                  <span className={`badge ${statusClass(b.status)}`}>Pending Payment</span>
                 </div>
-                <div className="booking-info-block">
-                  <div className="booking-info-item">
-                    <span className="info-label">Booked on</span>
-                    <span className="info-value">{formatDate(b.bookedAt)}</span>
-                  </div>
-                  <div className="booking-info-item">
-                    <span className="info-label">Seats</span>
-                    <span className="info-value">{(b.seats || []).join(', ') || '—'}</span>
-                  </div>
-                  <div className="booking-info-item">
-                    <span className="info-label">Amount</span>
-                    <span className="info-value">INR {Number(b.totalAmount).toLocaleString('en-IN')}</span>
-                  </div>
+                <StepTracker bookingStep={b.bookingStep} />
+                <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
+                  <button
+                    className="btn btn-primary btn-sm"
+                    onClick={e => { e.stopPropagation(); navigate(`/my-bookings/${b.id}`); }}
+                  >
+                    {b.bookingStep === 'PASSENGERS_SAVED' ? 'Go to payment →' : 'Complete booking →'}
+                  </button>
                 </div>
               </div>
-              <div className="booking-row-side">
-                <div className="booking-statuses">
-                  <span className={`badge ${statusClass(b.status)}`}>{b.status}</span>
-                  <span className={`badge ${paymentClass(b.paymentStatus)}`}>{b.paymentStatus}</span>
+            ))}
+          </div>
+        </>
+      )}
+
+      {/* Confirmed / Cancelled */}
+      {!loading && completed.length > 0 && (
+        <>
+          {pending.length > 0 && <p className="section-label">Completed</p>}
+          <div className="bookings-list">
+            {completed.map((b, i) => (
+              <div
+                key={b.id}
+                className="booking-row card fade-up"
+                style={{ animationDelay: `${i * 0.04}s`, cursor: 'pointer' }}
+                onClick={() => navigate(`/my-bookings/${b.id}`)}
+              >
+                <div className="booking-row-main">
+                  <div className="booking-ref-block">
+                    <span className="booking-ref">{b.bookingReference}</span>
+                    <span className="booking-flight">{b.flightNumber}</span>
+                  </div>
+                  <div className="booking-info-block">
+                    <div className="booking-info-item">
+                      <span className="info-label">Booked on</span>
+                      <span className="info-value">{formatDate(b.bookedAt)}</span>
+                    </div>
+                    <div className="booking-info-item">
+                      <span className="info-label">Seats</span>
+                      <span className="info-value">{(b.seats || []).join(', ') || '—'}</span>
+                    </div>
+                    <div className="booking-info-item">
+                      <span className="info-label">Amount</span>
+                      <span className="info-value">INR {Number(b.totalAmount).toLocaleString('en-IN')}</span>
+                    </div>
+                  </div>
                 </div>
-                <button
-                  className="btn btn-outline btn-sm"
-                  onClick={() => navigate(`/track?flight=${b.flightNumber}`)}
-                >
-                  Track flight
-                </button>
+                <div className="booking-row-side">
+                  <div className="booking-statuses">
+                    <span className={`badge ${statusClass(b.status)}`}>
+                      {b.status === 'PENDING_PAYMENT' ? 'Pending Payment' : b.status}
+                    </span>
+                  </div>
+                  {b.status === 'CONFIRMED' && (
+                    <button
+                      className="btn btn-outline btn-sm"
+                      onClick={e => { e.stopPropagation(); navigate(`/track?flight=${b.flightNumber}`); }}
+                    >
+                      Track flight
+                    </button>
+                  )}
+                </div>
               </div>
-            </div>
-          ))}
-        </div>
+            ))}
+          </div>
+        </>
       )}
     </div>
   );

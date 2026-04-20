@@ -13,7 +13,7 @@ import java.util.Optional;
 @Service
 public class FlightTrackingService {
 
-    private static final DateTimeFormatter DISPLAY = DateTimeFormatter.ofPattern("dd MMM HH:mm");
+    private static final DateTimeFormatter DISPLAY   = DateTimeFormatter.ofPattern("dd MMM HH:mm");
     private static final DateTimeFormatter TIME_ONLY = DateTimeFormatter.ofPattern("HH:mm");
 
     private final FlightRepository flightRepository;
@@ -26,23 +26,25 @@ public class FlightTrackingService {
     }
 
     public FlightTrackingResponse trackByFlightNumber(String flightNumber) {
-        // 1. Try Aviationstack live data first (works for real IATA flight numbers)
+        // 1. Always try Aviationstack live data first — works for any real IATA flight number
         FlightTrackingResponse live = trackingClient.fetchStatus(flightNumber);
         if (live != null) return live;
 
-        // 2. Look up in our Firestore DB (all searched/booked flights are stored here)
+        // 2. Fall back to our Firestore DB for flights searched/booked in this system
         Optional<Flight> dbFlight = flightRepository.findByFlightNumber(flightNumber);
         if (dbFlight.isPresent()) {
             return deriveFromSchedule(dbFlight.get());
         }
 
-        // 3. Not found anywhere — return helpful response (no 404)
+        // 3. Not found in either source
         FlightTrackingResponse r = new FlightTrackingResponse();
         r.setFlightNumber(flightNumber);
         r.setStatus("NOT_FOUND");
         r.setCurrentLocation("N/A");
         r.setDestination("N/A");
-        r.setRemarks("Flight not found. Search for a flight first — it will be trackable after booking.");
+        r.setRemarks("No data found for " + flightNumber + ". This flight may not be currently active, "
+                + "or may not be covered by the Aviationstack free tier. "
+                + "Try an active flight like AI860, EK512, 6E2134, or BA142.");
         r.setDataSource("NONE");
         return r;
     }

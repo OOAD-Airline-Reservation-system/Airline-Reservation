@@ -1,3 +1,5 @@
+@import './cabin.css';
+
 .seat-layout {
   display: grid;
   grid-template-columns: 1fr 300px;
@@ -6,84 +8,6 @@
 }
 
 .seat-main { min-width: 0; }
-
-.seat-legend {
-  display: flex;
-  align-items: center;
-  gap: 20px;
-  margin-bottom: 28px;
-}
-
-.legend-item {
-  display: flex;
-  align-items: center;
-  gap: 7px;
-  font-size: 0.8rem;
-  color: var(--ink-muted);
-}
-
-.seat-dot {
-  width: 14px;
-  height: 14px;
-  border-radius: 3px;
-}
-
-.seat-dot.available { background: var(--paper-warm); border: 1px solid var(--border); }
-.seat-dot.booked { background: var(--border); }
-.seat-dot.selected { background: var(--ink); }
-
-.seat-section { margin-bottom: 32px; }
-
-.seat-class-label {
-  font-size: 0.72rem;
-  text-transform: uppercase;
-  letter-spacing: 0.1em;
-  font-weight: 500;
-  color: var(--ink-muted);
-  margin-bottom: 12px;
-}
-
-.seat-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, 52px);
-  gap: 8px;
-}
-
-.seat-btn {
-  width: 52px;
-  height: 44px;
-  border-radius: var(--radius);
-  font-size: 0.72rem;
-  font-weight: 500;
-  letter-spacing: 0.02em;
-  transition: all var(--transition);
-}
-
-.seat-btn.seat-available {
-  background: var(--paper-warm);
-  border: 1px solid var(--border);
-  color: var(--ink-soft);
-}
-
-.seat-btn.seat-available:hover {
-  background: var(--ink);
-  color: var(--paper-cold);
-  border-color: var(--ink);
-  transform: translateY(-2px);
-}
-
-.seat-btn.seat-booked {
-  background: var(--border-soft);
-  border: 1px solid var(--border-soft);
-  color: var(--border);
-  cursor: not-allowed;
-}
-
-.seat-btn.seat-selected {
-  background: var(--ink);
-  border: 1px solid var(--ink);
-  color: var(--paper-cold);
-}
 
 .seat-sidebar {
   padding: 24px;
@@ -108,9 +32,8 @@
   margin-bottom: 10px;
   gap: 16px;
 }
-
 .summary-row span:first-child { color: var(--ink-muted); flex-shrink: 0; }
-.summary-row span:last-child { text-align: right; }
+.summary-row span:last-child  { text-align: right; }
 
 .summary-total {
   font-weight: 500;
@@ -118,7 +41,6 @@
   font-size: 0.95rem !important;
   margin-top: 4px;
 }
-
 .summary-total span { color: var(--ink) !important; }
 
 .sidebar-empty {

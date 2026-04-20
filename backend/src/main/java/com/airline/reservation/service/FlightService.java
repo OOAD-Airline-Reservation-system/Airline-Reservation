@@ -38,26 +38,27 @@ public class FlightService {
         String source = request.getSource().toUpperCase().trim();
         String destination = request.getDestination().toUpperCase().trim();
 
-        // Fetch from route templates (works for any date)
         List<Flight> apiFlights = aeroDataBoxClient.fetchDepartures(source, destination, request.getDate());
 
         if (!apiFlights.isEmpty()) {
             List<FlightResponse> responses = new ArrayList<>();
             for (Flight f : apiFlights) {
-                // Parse display fields before saving plain IATA to Firestore
                 String[] srcParts = f.getSource().split("\\|", 3);
                 String[] dstParts = f.getDestination().split("\\|", 2);
-                String srcIata     = srcParts[0];
-                String srcAirport  = srcParts.length > 1 ? srcParts[1] : srcParts[0];
-                String airline     = srcParts.length > 2 ? srcParts[2] : "";
-                String dstIata     = dstParts[0];
-                String dstAirport  = dstParts.length > 1 ? dstParts[1] : dstParts[0];
+                String srcIata    = srcParts[0];
+                String srcAirport = srcParts.length > 1 ? srcParts[1] : srcParts[0];
+                String airline    = srcParts.length > 2 ? srcParts[2] : "";
+                String dstIata    = dstParts[0];
+                String dstAirport = dstParts.length > 1 ? dstParts[1] : dstParts[0];
 
-                // Store plain IATA in Firestore for reliable querying
                 f.setSource(srcIata);
                 f.setDestination(dstIata);
 
-                // Upsert: use flightNumber+date as stable ID to avoid duplicates
+                // Skip flights that have already departed
+                if (f.getDepartureTime() != null && f.getDepartureTime().isBefore(java.time.LocalDateTime.now())) {
+                    continue;
+                }
+
                 String stableId = f.getFlightNumber() + "-" + request.getDate().toString();
                 f.setId(stableId);
                 flightRepository.save(f);
@@ -75,13 +76,16 @@ public class FlightService {
             return responses;
         }
 
-        // Fallback: Firestore cache
+        // Fallback: Firestore cache — also filter past flights
         log.warn("No route templates for {}->{}, checking Firestore cache", source, destination);
         var start = request.getDate().atStartOfDay();
         var end   = request.getDate().plusDays(1).atStartOfDay().minusNanos(1);
+        var now   = java.time.LocalDateTime.now();
         return flightRepository
                 .findBySourceAndDestinationAndDepartureBetween(source, destination, start, end)
-                .stream().map(this::toResponse).toList();
+                .stream()
+                .filter(f -> f.getDepartureTime() == null || f.getDepartureTime().isAfter(now))
+                .map(this::toResponse).toList();
     }
 
     public Flight getFlightById(String flightId) {
@@ -105,14 +109,19 @@ public class FlightService {
 
     private List<Seat> buildSeats(Flight flight) {
         List<Seat> seats = new ArrayList<>();
+        // Business class: rows 1-4, 2+2 config (A B | C D)
+        String[] busCols = {"A", "B", "C", "D"};
         for (int row = 1; row <= 4; row++) {
-            seats.add(seat(flight, row + "A", SeatClass.BUSINESS, "9500.00"));
-            seats.add(seat(flight, row + "B", SeatClass.BUSINESS, "9500.00"));
+            for (String col : busCols) {
+                seats.add(seat(flight, row + col, SeatClass.BUSINESS, "9500.00"));
+            }
         }
-        for (int row = 10; row <= 14; row++) {
-            seats.add(seat(flight, row + "A", SeatClass.ECONOMY, flight.getBasePrice().toPlainString()));
-            seats.add(seat(flight, row + "B", SeatClass.ECONOMY, flight.getBasePrice().toPlainString()));
-            seats.add(seat(flight, row + "C", SeatClass.ECONOMY, flight.getBasePrice().toPlainString()));
+        // Economy class: rows 10-25, 3+3 config (A B C | D E F)
+        String[] ecoCols = {"A", "B", "C", "D", "E", "F"};
+        for (int row = 10; row <= 25; row++) {
+            for (String col : ecoCols) {
+                seats.add(seat(flight, row + col, SeatClass.ECONOMY, flight.getBasePrice().toPlainString()));
+            }
         }
         return seats;
     }

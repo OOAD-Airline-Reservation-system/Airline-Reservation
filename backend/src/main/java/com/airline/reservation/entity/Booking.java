@@ -22,6 +22,7 @@ public class Booking {
     private LocalDateTime bookedAt;
     private List<String> seatIds = new ArrayList<>();  // replaces @OneToMany Seat
     private String paymentId;   // replaces @OneToOne Payment
+    private BookingStep bookingStep;
 
     public String getId() { return id; }
     public void setId(String id) { this.id = id; }
@@ -52,4 +53,7 @@ public class Booking {
 
     public String getPaymentId() { return paymentId; }
     public void setPaymentId(String paymentId) { this.paymentId = paymentId; }
+
+    public BookingStep getBookingStep() { return bookingStep; }
+    public void setBookingStep(BookingStep bookingStep) { this.bookingStep = bookingStep; }
 }

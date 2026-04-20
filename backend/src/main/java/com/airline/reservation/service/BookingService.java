@@ -55,6 +55,7 @@ public class BookingService {
         }
 
         Booking booking = bookingFactory.create(userEmail, flight, seats);
+        booking.setBookingStep(BookingStep.SEATS_SELECTED);
         bookingRepository.save(booking);
 
         for (Seat seat : seats) {
@@ -100,6 +101,25 @@ public class BookingService {
         validateBookingOwnership(getBookingEntity(bookingId), userEmail);
     }
 
+    public BookingResponse cancelBooking(String bookingId, String userEmail) {
+        Booking booking = getBookingEntity(bookingId);
+        validateBookingOwnership(booking, userEmail);
+        if (booking.getStatus() == BookingStatus.CANCELLED) {
+            throw new BadRequestException("Booking is already cancelled");
+        }
+        booking.setStatus(BookingStatus.CANCELLED);
+        bookingRepository.save(booking);
+        List<Seat> seats = seatRepository.findByFlightIdAndIds(booking.getFlightId(), booking.getSeatIds());
+        for (Seat seat : seats) {
+            seat.setStatus(SeatStatus.AVAILABLE);
+            seat.setBookingId(null);
+            seatRepository.save(seat);
+        }
+        Flight flight = flightRepository.findById(booking.getFlightId())
+                .orElseThrow(() -> new ResourceNotFoundException("Flight not found"));
+        return mapToResponse(booking, seats, flight);
+    }
+
     public BookingResponse mapToResponse(Booking booking, List<Seat> seats, Flight flight) {
         BookingResponse r = new BookingResponse();
         r.setId(booking.getId());
@@ -111,6 +131,7 @@ public class BookingService {
         r.setTotalAmount(booking.getTotalAmount());
         r.setBookedAt(booking.getBookedAt());
         r.setSeats(seats.stream().map(Seat::getSeatNumber).toList());
+        r.setBookingStep(booking.getBookingStep());
         return r;
     }
 }

@@ -1,7 +1,9 @@
 package com.airline.reservation.service;
 
+import com.airline.reservation.entity.BookingStep;
 import com.airline.reservation.entity.PassengerDetails;
 import com.airline.reservation.exception.BadRequestException;
+import com.airline.reservation.repository.BookingRepository;
 import com.airline.reservation.repository.PassengerDetailsRepository;
 import org.springframework.stereotype.Service;
 
@@ -19,9 +21,12 @@ import java.util.Map;
 public class PassengerDetailsService {
 
     private final PassengerDetailsRepository passengerDetailsRepository;
+    private final BookingRepository bookingRepository;
 
-    public PassengerDetailsService(PassengerDetailsRepository passengerDetailsRepository) {
+    public PassengerDetailsService(PassengerDetailsRepository passengerDetailsRepository,
+                                   BookingRepository bookingRepository) {
         this.passengerDetailsRepository = passengerDetailsRepository;
+        this.bookingRepository = bookingRepository;
     }
 
     /** Replace all passenger details for a booking (delete-then-insert). */
@@ -30,7 +35,12 @@ public class PassengerDetailsService {
             throw new BadRequestException("Passenger list must not be empty");
         }
         passengerDetailsRepository.deleteAllByBookingId(bookingId);
-        return passengerDetailsRepository.saveAll(bookingId, passengers);
+        List<PassengerDetails> saved = passengerDetailsRepository.saveAll(bookingId, passengers);
+        bookingRepository.findById(bookingId).ifPresent(b -> {
+            b.setBookingStep(BookingStep.PASSENGERS_SAVED);
+            bookingRepository.save(b);
+        });
+        return saved;
     }
 
     public List<Map<String, Object>> getPassengers(String bookingId) {
