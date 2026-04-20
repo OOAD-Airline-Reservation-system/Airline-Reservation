@@ -17,7 +17,6 @@
 11. [Booking Workflow](#11-booking-workflow)
 12. [Loyalty Programme](#12-loyalty-programme)
 13. [Available Routes](#13-available-routes)
-14. [Steps to Execute](#14-Steps-to-execute)
 
 ---
 
@@ -345,226 +344,6 @@ output/
 ## 9. Setup and Installation
 
 ### Prerequisites
-
-- Java 17 or higher
-- Apache Maven 3.x
-- Node.js 18 or higher with npm
-- A Firebase project with Firestore enabled in Native mode
-- A Firebase service account JSON key file
-
-### Backend Setup
-
-```bash
-cd output/backend
-```
-
-Place your Firebase service account JSON file in `src/main/resources/` and update `application.yml` with the correct filename and project ID. Add any optional API keys as described below.
-
-```bash
-mvn spring-boot:run
-```
-
-The backend starts on `http://localhost:8080`. On first startup, the system logs that flight data is served from the route table.
-
-### Frontend Setup
-
-```bash
-cd output/frontend
-npm install
-npm run dev
-```
-
-The frontend starts on `http://localhost:5173`. The Vite development proxy automatically forwards all requests to `/api/*` and `/auth/*` to the backend at port 8080, eliminating any CORS configuration requirements during development.
-
-### Configuration Reference
-
-All backend configuration is managed through `src/main/resources/application.yml`:
-
-```yaml
-app:
-  jwt:
-    secret: "your-base64-encoded-256-bit-secret"
-    expiration-ms: 3600000
-
-  firebase:
-    service-account-key: "classpath:your-firebase-adminsdk.json"
-    project-id: "your-firebase-project-id"
-
-  aviationstack:
-    api-key: "your-aviationstack-key"     # https://aviationstack.com — free: 500 req/month
-    base-url: "http://api.aviationstack.com/v1"
-
-  gemini:
-    api-key: "your-gemini-key"            # https://makersuite.google.com/app/apikey
-
-  razorpay:
-    key-id: ""                            # Optional — demo mode works without credentials
-    key-secret: ""
-
-  aerodatabox:
-    api-key: "your-rapidapi-key"          # Required only if enabling AeroDataBox integration
-    api-host: "aerodatabox.p.rapidapi.com"
-```
-
----
-
-## 10. API Reference
-
-### Authentication Endpoints
-
-| Method | Path | Description | Auth Required |
-|---|---|---|---|
-| POST | `/auth/register` | Register a new user and auto-enrol in loyalty programme | No |
-| POST | `/auth/login` | Authenticate and receive a JWT access token | No |
-
-### Flight and Seat Endpoints
-
-| Method | Path | Description | Auth Required |
-|---|---|---|---|
-| GET | `/api/flights/search` | Search flights by source IATA, destination IATA, and date | Yes |
-| GET | `/api/seats/flight/{flightId}` | Retrieve the seat map for a specific flight | Yes |
-
-### Booking Endpoints
-
-| Method | Path | Description | Auth Required |
-|---|---|---|---|
-| POST | `/api/bookings` | Create a new booking and lock selected seats | Yes |
-| GET | `/api/bookings/me` | Retrieve all bookings for the authenticated user | Yes |
-| GET | `/api/bookings/{id}` | Retrieve a specific booking by ID | Yes |
-| POST | `/api/bookings/{id}/passengers` | Save passenger details for a booking | Yes |
-| GET | `/api/bookings/{id}/passengers` | Retrieve passenger details for a booking | Yes |
-
-### Payment Endpoints
-
-| Method | Path | Description | Auth Required |
-|---|---|---|---|
-| POST | `/api/payments` | Process payment for a booking and award loyalty points | Yes |
-
-### Loyalty Endpoints
-
-| Method | Path | Description | Auth Required |
-|---|---|---|---|
-| GET | `/api/loyalty/me` | Retrieve loyalty account, tier, balance, and transaction history | Yes |
-| POST | `/api/loyalty/redeem` | Redeem loyalty points for a discount on a booking | Yes |
-
-### Tracking and AI Endpoints
-
-| Method | Path | Description | Auth Required |
-|---|---|---|---|
-| GET | `/api/tracking/{flightNumber}` | Retrieve live or schedule-derived flight status | Yes |
-| GET | `/api/trips/suggest` | Generate AI trip suggestions via Gemini | Yes |
-
-#### Example Requests
-
-```
-GET /api/flights/search?source=DEL&destination=BOM&date=2025-05-10
-
-GET /api/tracking/AI860
-
-GET /api/trips/suggest?from=DEL&budget=20000&interests=beaches,culture&duration=5
-```
-
----
-
-## 11. Booking Workflow
-
-The complete end-to-end booking process follows these steps:
-
-```
-Step 1 — Flight Search (HomePage)
-         User enters origin and destination IATA codes and selects a travel date.
-         The backend queries the route table and returns matching flights.
-
-Step 2 — Seat Selection (SeatPage)
-         User views the interactive seat map for the selected flight.
-         Available, locked, and booked seats are displayed with distinct styling.
-         User selects one or more seats.
-
-Step 3 — Booking Confirmation (ConfirmPage)
-         User reviews the flight details, selected seats, and price breakdown.
-         On confirmation, the backend creates a booking record in Firestore,
-         locks the selected seats, and returns a booking reference.
-
-Step 4 — Passenger Details (PassengerFormPage)
-         User enters travel document details for each passenger including
-         passport information, contact details, and meal preference.
-         Details are saved to a Firestore sub-collection under the booking.
-
-Step 5 — Payment (PaymentPage)
-         User selects Card or UPI payment method and enters payment details.
-         The backend routes the payment through the Razorpay adapter.
-         On success, the booking status is updated to CONFIRMED, seats are
-         marked as BOOKED, and loyalty points are awarded.
-
-Step 6 — Booking Success (SuccessPage)
-         The confirmed booking reference is displayed to the user.
-
-Step 7 — Flight Tracking (TrackPage)
-         At any time, the user can track a flight by its IATA number.
-         Live data is retrieved from Aviationstack where available.
-         For future flights, status is derived from scheduled times.
-
-Step 8 — Loyalty Dashboard (LoyaltyPage)
-         User can view their tier status, points balance, transaction history,
-         and redeem points for discounts on future bookings.
-```
-
----
-
-## 12. Loyalty Programme
-
-The ARS Loyalty Programme automatically enrols every registered user. Points are earned on every completed payment and can be redeemed for discounts on future bookings.
-
-| Tier | Lifetime Points Required | Benefits |
-|---|---|---|
-| Bronze | 0 to 4,999 | 1 point per INR 10 spent |
-| Silver | 5,000 to 19,999 | 10% bonus points, priority check-in |
-| Gold | 20,000 to 49,999 | 20% bonus points, lounge access |
-| Platinum | 50,000 and above | 30% bonus points, unlimited lounge access, upgrade eligibility |
-
-**Earning rate:** 1 point per INR 10 spent on completed bookings.
-**Redemption rate:** 10 points = INR 1 discount on a booking.
-**Tier progression:** Based on lifetime points accumulated, which never decrease.
-
----
-
-## 13. Available Routes
-
-The following routes are available for search and booking. All routes operate in both directions unless indicated otherwise.
-
-### Domestic Routes
-
-| Origin | Destination | Airlines |
-|---|---|---|
-| DEL | BOM | Air India, IndiGo, SpiceJet, Vistara |
-| DEL | BLR | Air India, IndiGo, Vistara |
-| DEL | MAA | Air India, IndiGo |
-| DEL | HYD | Air India, IndiGo |
-| DEL | CCU | Air India, IndiGo |
-| BOM | BLR | Air India, IndiGo |
-| BOM | MAA | Air India, IndiGo |
-| BOM | GOI | Air India, IndiGo |
-
-### International Routes
-
-| Origin | Destination | Airlines |
-|---|---|---|
-| DEL, BOM | DXB | Emirates, Air India |
-| DEL, BOM | LHR | British Airways, Air India |
-| DEL, BOM | SIN | Singapore Airlines, Air India |
-| DEL | JFK | Air India, United Airlines |
-| DEL | CDG | Air France, Air India |
-| DEL | FRA | Lufthansa, Air India |
-| DEL | NRT | Japan Airlines, Air India |
-| BOM | HKG | Cathay Pacific, Air India |
-| DEL | SYD | Qantas, Air India |
-| BOM | JFK | Air India |
-
- ## 14. Steps to execute
- 
-This section covers every prerequisite and configuration step needed to get both the backend and frontend running locally from scratch, including Firebase setup and all external API keys.
- 
-### Prerequisites
  
 Make sure the following are installed on your machine before proceeding:
  
@@ -748,3 +527,157 @@ The `vite.config.js` file already contains a proxy rule that forwards all `/api/
 | `npm install` fails | Node.js version below 18 | Upgrade Node.js at https://nodejs.org |
  
 ---
+
+---
+
+## 10. API Reference
+
+### Authentication Endpoints
+
+| Method | Path | Description | Auth Required |
+|---|---|---|---|
+| POST | `/auth/register` | Register a new user and auto-enrol in loyalty programme | No |
+| POST | `/auth/login` | Authenticate and receive a JWT access token | No |
+
+### Flight and Seat Endpoints
+
+| Method | Path | Description | Auth Required |
+|---|---|---|---|
+| GET | `/api/flights/search` | Search flights by source IATA, destination IATA, and date | Yes |
+| GET | `/api/seats/flight/{flightId}` | Retrieve the seat map for a specific flight | Yes |
+
+### Booking Endpoints
+
+| Method | Path | Description | Auth Required |
+|---|---|---|---|
+| POST | `/api/bookings` | Create a new booking and lock selected seats | Yes |
+| GET | `/api/bookings/me` | Retrieve all bookings for the authenticated user | Yes |
+| GET | `/api/bookings/{id}` | Retrieve a specific booking by ID | Yes |
+| POST | `/api/bookings/{id}/passengers` | Save passenger details for a booking | Yes |
+| GET | `/api/bookings/{id}/passengers` | Retrieve passenger details for a booking | Yes |
+
+### Payment Endpoints
+
+| Method | Path | Description | Auth Required |
+|---|---|---|---|
+| POST | `/api/payments` | Process payment for a booking and award loyalty points | Yes |
+
+### Loyalty Endpoints
+
+| Method | Path | Description | Auth Required |
+|---|---|---|---|
+| GET | `/api/loyalty/me` | Retrieve loyalty account, tier, balance, and transaction history | Yes |
+| POST | `/api/loyalty/redeem` | Redeem loyalty points for a discount on a booking | Yes |
+
+### Tracking and AI Endpoints
+
+| Method | Path | Description | Auth Required |
+|---|---|---|---|
+| GET | `/api/tracking/{flightNumber}` | Retrieve live or schedule-derived flight status | Yes |
+| GET | `/api/trips/suggest` | Generate AI trip suggestions via Gemini | Yes |
+
+#### Example Requests
+
+```
+GET /api/flights/search?source=DEL&destination=BOM&date=2025-05-10
+
+GET /api/tracking/AI860
+
+GET /api/trips/suggest?from=DEL&budget=20000&interests=beaches,culture&duration=5
+```
+
+---
+
+## 11. Booking Workflow
+
+The complete end-to-end booking process follows these steps:
+
+```
+Step 1 — Flight Search (HomePage)
+         User enters origin and destination IATA codes and selects a travel date.
+         The backend queries the route table and returns matching flights.
+
+Step 2 — Seat Selection (SeatPage)
+         User views the interactive seat map for the selected flight.
+         Available, locked, and booked seats are displayed with distinct styling.
+         User selects one or more seats.
+
+Step 3 — Booking Confirmation (ConfirmPage)
+         User reviews the flight details, selected seats, and price breakdown.
+         On confirmation, the backend creates a booking record in Firestore,
+         locks the selected seats, and returns a booking reference.
+
+Step 4 — Passenger Details (PassengerFormPage)
+         User enters travel document details for each passenger including
+         passport information, contact details, and meal preference.
+         Details are saved to a Firestore sub-collection under the booking.
+
+Step 5 — Payment (PaymentPage)
+         User selects Card or UPI payment method and enters payment details.
+         The backend routes the payment through the Razorpay adapter.
+         On success, the booking status is updated to CONFIRMED, seats are
+         marked as BOOKED, and loyalty points are awarded.
+
+Step 6 — Booking Success (SuccessPage)
+         The confirmed booking reference is displayed to the user.
+
+Step 7 — Flight Tracking (TrackPage)
+         At any time, the user can track a flight by its IATA number.
+         Live data is retrieved from Aviationstack where available.
+         For future flights, status is derived from scheduled times.
+
+Step 8 — Loyalty Dashboard (LoyaltyPage)
+         User can view their tier status, points balance, transaction history,
+         and redeem points for discounts on future bookings.
+```
+
+---
+
+## 12. Loyalty Programme
+
+The ARS Loyalty Programme automatically enrols every registered user. Points are earned on every completed payment and can be redeemed for discounts on future bookings.
+
+| Tier | Lifetime Points Required | Benefits |
+|---|---|---|
+| Bronze | 0 to 4,999 | 1 point per INR 10 spent |
+| Silver | 5,000 to 19,999 | 10% bonus points, priority check-in |
+| Gold | 20,000 to 49,999 | 20% bonus points, lounge access |
+| Platinum | 50,000 and above | 30% bonus points, unlimited lounge access, upgrade eligibility |
+
+**Earning rate:** 1 point per INR 10 spent on completed bookings.
+**Redemption rate:** 10 points = INR 1 discount on a booking.
+**Tier progression:** Based on lifetime points accumulated, which never decrease.
+
+---
+
+## 13. Available Routes
+
+The following routes are available for search and booking. All routes operate in both directions unless indicated otherwise.
+
+### Domestic Routes
+
+| Origin | Destination | Airlines |
+|---|---|---|
+| DEL | BOM | Air India, IndiGo, SpiceJet, Vistara |
+| DEL | BLR | Air India, IndiGo, Vistara |
+| DEL | MAA | Air India, IndiGo |
+| DEL | HYD | Air India, IndiGo |
+| DEL | CCU | Air India, IndiGo |
+| BOM | BLR | Air India, IndiGo |
+| BOM | MAA | Air India, IndiGo |
+| BOM | GOI | Air India, IndiGo |
+
+### International Routes
+
+| Origin | Destination | Airlines |
+|---|---|---|
+| DEL, BOM | DXB | Emirates, Air India |
+| DEL, BOM | LHR | British Airways, Air India |
+| DEL, BOM | SIN | Singapore Airlines, Air India |
+| DEL | JFK | Air India, United Airlines |
+| DEL | CDG | Air France, Air India |
+| DEL | FRA | Lufthansa, Air India |
+| DEL | NRT | Japan Airlines, Air India |
+| BOM | HKG | Cathay Pacific, Air India |
+| DEL | SYD | Qantas, Air India |
+| BOM | JFK | Air India |
