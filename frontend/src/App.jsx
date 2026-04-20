@@ -12,6 +12,7 @@ import PassengerFormPage from './pages/PassengerFormPage';
 import PaymentPage from './pages/PaymentPage';
 import SuccessPage from './pages/SuccessPage';
 import MyBookingsPage from './pages/MyBookingsPage';
+import BookingDetailPage from './pages/BookingDetailPage';
 import TrackPage from './pages/TrackPage';
 import LoyaltyPage from './pages/LoyaltyPage';
 
@@ -32,6 +33,7 @@ export default function App() {
             <Route path="/payment"             element={<ProtectedRoute><PaymentPage /></ProtectedRoute>} />
             <Route path="/booking/success"     element={<ProtectedRoute><SuccessPage /></ProtectedRoute>} />
             <Route path="/my-bookings"         element={<ProtectedRoute><MyBookingsPage /></ProtectedRoute>} />
+            <Route path="/my-bookings/:id"      element={<ProtectedRoute><BookingDetailPage /></ProtectedRoute>} />
             <Route path="/track"               element={<ProtectedRoute><TrackPage /></ProtectedRoute>} />
             <Route path="/loyalty"             element={<ProtectedRoute><LoyaltyPage /></ProtectedRoute>} />
 

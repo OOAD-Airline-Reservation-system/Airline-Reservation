@@ -1,0 +1,172 @@
+@import './cabin.css';
+
+.back-link {
+  background: none;
+  border: none;
+  color: var(--ink-muted);
+  font-size: 0.85rem;
+  cursor: pointer;
+  padding: 0;
+  margin-bottom: 24px;
+  display: inline-block;
+}
+.back-link:hover { color: var(--ink); }
+
+.bd-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 24px;
+}
+
+.bd-flight-card { padding: 28px; margin-bottom: 16px; }
+
+.bd-flight-meta-top {
+  display: flex;
+  gap: 32px;
+  flex-wrap: wrap;
+  margin-bottom: 0;
+}
+
+.bd-fn-block { display: flex; flex-direction: column; gap: 3px; }
+
+.bd-fn-label {
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  color: var(--ink-muted);
+  font-weight: 500;
+}
+
+.bd-fn-value {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--ink);
+  font-family: var(--font-display);
+  letter-spacing: -0.01em;
+}
+
+.bd-route {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+}
+
+.bd-airport { display: flex; flex-direction: column; gap: 4px; flex: 1; }
+.bd-airport-right { text-align: right; align-items: flex-end; }
+
+.bd-iata {
+  font-family: var(--font-display);
+  font-size: 2rem;
+  font-weight: 500;
+  color: var(--ink);
+  letter-spacing: -0.02em;
+}
+
+.bd-airport-name { font-size: 0.78rem; color: var(--ink-muted); }
+.bd-time { font-size: 0.85rem; color: var(--ink); font-weight: 500; margin-top: 4px; }
+
+.bd-route-mid {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.bd-route-line {
+  width: 120px;
+  height: 1px;
+  background: var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.bd-plane { font-size: 1rem; background: var(--paper); padding: 0 6px; }
+
+.bd-meta {
+  display: flex;
+  gap: 32px;
+  flex-wrap: wrap;
+  align-items: center;
+  padding-top: 20px;
+  border-top: 1px solid var(--border);
+}
+
+.bd-meta-item { display: flex; flex-direction: column; gap: 3px; }
+
+.bd-seats-card { padding: 28px; margin-bottom: 16px; }
+
+.bd-section-title {
+  font-family: var(--font-display);
+  font-size: 1.1rem;
+  font-weight: 400;
+  color: var(--ink);
+  margin-bottom: 16px;
+}
+
+.bd-pending-card {
+  padding: 32px;
+  text-align: center;
+  border: 1px dashed var(--border);
+}
+
+.bd-pending-msg {
+  font-size: 0.9rem;
+  color: var(--ink-muted);
+  margin-bottom: 20px;
+}
+
+.btn-danger { background: #dc2626; color: #fff; border: none; }
+.btn-danger:hover { background: #b91c1c; }
+
+.alert-refund {
+  background: #f0fdf4;
+  border: 1px solid #86efac;
+  color: #166534;
+  padding: 14px 18px;
+  border-radius: var(--radius);
+  font-size: 0.875rem;
+  margin-bottom: 16px;
+}
+
+/* Step tracker */
+.step-tracker { display: flex; align-items: center; }
+
+.step-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex: 1;
+  min-width: 0;
+}
+
+.step-dot {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.72rem;
+  font-weight: 600;
+  flex-shrink: 0;
+}
+
+.step-done .step-dot    { background: #16a34a; color: #fff; }
+.step-current .step-dot { background: var(--accent, #2563eb); color: #fff; }
+.step-todo .step-dot    { background: var(--border); color: var(--ink-muted); }
+
+.step-label { font-size: 0.78rem; white-space: nowrap; }
+.step-done .step-label    { color: #16a34a; font-weight: 500; }
+.step-current .step-label { color: var(--ink); font-weight: 600; }
+.step-todo .step-label    { color: var(--ink-muted); }
+
+.step-line { flex: 1; height: 1px; background: var(--border); margin: 0 6px; }
+
+@media (max-width: 600px) {
+  .bd-route { flex-direction: column; align-items: flex-start; }
+  .bd-airport-right { align-items: flex-start; text-align: left; }
+  .bd-route-line { width: 60px; }
+  .bd-meta { gap: 16px; }
+}

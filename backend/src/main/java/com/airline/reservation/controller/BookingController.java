@@ -34,4 +34,9 @@ public class BookingController {
     public List<BookingResponse> getMyBookings(Authentication authentication) {
         return bookingService.getMyBookings(authentication.getName());
     }
+
+    @DeleteMapping("/{bookingId}")
+    public BookingResponse cancelBooking(@PathVariable String bookingId, Authentication authentication) {
+        return bookingService.cancelBooking(bookingId, authentication.getName());
+    }
 }
