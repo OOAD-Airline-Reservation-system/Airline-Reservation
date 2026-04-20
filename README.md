@@ -1,9 +1,5 @@
 # Airline Reservation System (ARS)
 
-**Course:** UE23CS352B — Object Oriented Analysis & Design
-**Institution:** PES University
-**Project Type:** Full-Stack Web Application
-
 ---
 
 ## Table of Contents
