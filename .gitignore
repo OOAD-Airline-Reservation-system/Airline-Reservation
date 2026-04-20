@@ -1,0 +1,18 @@
+# Maven build output
+backend/target/
+
+# Firebase service account key — NEVER commit this
+backend/src/main/resources/*-firebase-adminsdk-*.json
+
+# Environment / secrets
+*.env
+.env.local
+
+# Node
+frontend/node_modules/
+frontend/dist/
+
+# IDE
+.idea/
+*.iml
+.vscode/

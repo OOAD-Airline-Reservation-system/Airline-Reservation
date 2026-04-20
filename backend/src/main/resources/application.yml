@@ -1,0 +1,33 @@
+server:
+  error:
+    include-message: always
+
+app:
+  jwt:
+    secret: MDEyMzQ1Njc4OWFiY2RlZjAxMjM0NTY3ODlhYmNkZWYwMTIzNDU2Nzg5YWJjZGVmMDEyMzQ1Njc4OWFiY2RlZg==
+    expiration-ms: 3600000
+
+  firebase:
+    service-account-key: "classpath:airline-res-b62c8-firebase-adminsdk-fbsvc-6fc73615eb.json"
+    project-id: "airline-res-b62c8"
+
+  aviationstack:
+    api-key: "7b76ee0e80735cafb8b8b65922fbe249"
+    base-url: "http://api.aviationstack.com/v1"
+
+  aerodatabox:
+    api-key: "92cbf983c9mshc12cfd36aad39fbp15a98djsn758c7d7cda5c"
+    api-host: "aerodatabox.p.rapidapi.com"
+
+  razorpay:
+    key-id: ""
+    key-secret: ""
+
+  gemini:
+    api-key: "AIzaSyD26uLqMKaYMYCtFWliPI9tvVWop3EyJzQ"
+
+logging:
+  level:
+    com.airline: INFO
+    org.springframework.security: WARN
+    org.springframework.web: WARN
