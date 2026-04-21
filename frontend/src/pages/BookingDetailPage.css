@@ -25,7 +25,6 @@
   display: flex;
   gap: 32px;
   flex-wrap: wrap;
-  margin-bottom: 0;
 }
 
 .bd-fn-block { display: flex; flex-direction: column; gap: 3px; }

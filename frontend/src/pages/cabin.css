@@ -24,7 +24,7 @@
   flex-shrink: 0;
 }
 .seat-dot.available { background: var(--paper-warm); border: 1px solid var(--border); }
-.seat-dot.booked    { background: #f1f1f1; border: 1px solid #e0e0e0; }
+.seat-dot.booked    { background: #e0e0e0; border: 1px solid #d0d0d0; }
 .seat-dot.selected  { background: var(--ink); }
 
 .seat-legend-type { gap: 5px; }
@@ -74,12 +74,15 @@
 .cabin-row {
   display: flex;
   align-items: center;
-  margin-bottom: 5px;
+  margin-bottom: 6px;
 }
 
-.cabin-header { margin-bottom: 8px; }
+.cabin-header { margin-bottom: 10px; }
 
-.col-group { display: flex; gap: 5px; }
+.col-group {
+  display: flex;
+  gap: 6px;
+}
 
 .aisle-gap {
   width: 40px;
@@ -89,7 +92,11 @@
   flex-shrink: 0;
 }
 
-.row-num { font-size: 0.65rem; color: var(--ink-muted); font-weight: 500; }
+.row-num {
+  font-size: 0.65rem;
+  color: var(--ink-muted);
+  font-weight: 500;
+}
 
 .col-header {
   width: 44px;
@@ -100,7 +107,7 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 1px;
+  gap: 2px;
 }
 
 .col-type {
@@ -110,32 +117,54 @@
   letter-spacing: 0.04em;
 }
 
-/* Seat button */
+/* ── Seat button ─────────────────────────────────────────────────────────── */
+/* Works identically whether rendered as <button> or <div>                   */
 .seat-btn {
+  /* Reset all browser button defaults */
+  appearance: none;
+  -webkit-appearance: none;
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  font-family: inherit;
+
+  /* Fixed size */
   width: 44px;
   height: 40px;
+
+  /* Shape — seat body with rounded top, flat bottom */
   border-radius: 6px 6px 3px 3px;
+
+  /* Text */
   font-size: 0.68rem;
   font-weight: 500;
-  transition: all var(--transition);
-  position: relative;
-  display: flex;
+  line-height: 1;
+  text-align: center;
+
+  /* Layout */
+  display: inline-flex;
   align-items: center;
   justify-content: center;
-  border: none;
+
+  /* Headrest via pseudo-element */
+  position: relative;
+  margin-top: 6px; /* room for headrest */
+
+  transition: transform 0.15s ease, background 0.15s ease;
 }
 
-/* Headrest */
+/* Headrest notch */
 .seat-btn::before {
   content: '';
   position: absolute;
-  top: -4px;
-  left: 7px;
-  right: 7px;
-  height: 4px;
+  top: -5px;
+  left: 8px;
+  right: 8px;
+  height: 5px;
   border-radius: 3px 3px 0 0;
 }
 
+/* Available */
 .seat-btn.seat-available {
   background: var(--paper-warm);
   border: 1px solid var(--border);
@@ -145,35 +174,41 @@
 .seat-btn.seat-available::before { background: var(--border); }
 .seat-btn.seat-available:hover {
   background: var(--ink);
-  color: var(--paper-cold);
+  color: #fff;
   border-color: var(--ink);
   transform: translateY(-2px);
 }
-.seat-btn.seat-available:hover::before { background: var(--ink-muted); }
+.seat-btn.seat-available:hover::before { background: #555; }
 
+/* Taken / booked */
 .seat-btn.seat-booked {
-  background: #f1f1f1;
-  border: 1px solid #e0e0e0;
-  color: #ccc;
+  background: #ebebeb;
+  border: 1px solid #d8d8d8;
+  color: #bbb;
   cursor: not-allowed;
 }
-.seat-btn.seat-booked::before { background: #e0e0e0; }
+.seat-btn.seat-booked::before { background: #d8d8d8; }
 
+/* Selected (your seat) */
 .seat-btn.seat-selected {
   background: var(--ink);
   border: 1px solid var(--ink);
-  color: var(--paper-cold);
+  color: #fff;
   cursor: default;
 }
-.seat-btn.seat-selected::before { background: var(--ink-muted); }
+.seat-btn.seat-selected::before { background: #555; }
 
-.seat-empty { width: 44px; height: 40px; }
+.seat-empty {
+  width: 44px;
+  height: 40px;
+  margin-top: 6px;
+}
 
 /* Emergency exit row */
 .exit-row {
   display: flex;
   align-items: center;
-  margin: 8px 0 4px;
+  margin: 10px 0 6px;
 }
 
 .exit-marker {
@@ -202,8 +237,9 @@
 }
 
 @media (max-width: 480px) {
-  .seat-btn    { width: 38px; height: 36px; font-size: 0.6rem; }
-  .col-header  { width: 38px; }
-  .seat-empty  { width: 38px; }
-  .aisle-gap   { width: 28px; }
+  .seat-btn    { width: 36px; height: 34px; font-size: 0.58rem; }
+  .col-header  { width: 36px; }
+  .seat-empty  { width: 36px; height: 34px; }
+  .aisle-gap   { width: 24px; }
+  .col-group   { gap: 4px; }
 }
