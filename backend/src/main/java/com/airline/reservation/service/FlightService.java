@@ -65,6 +65,13 @@ public class FlightService {
 
                 if (seatRepository.findByFlightId(f.getId()).isEmpty()) {
                     seatRepository.saveAll(buildSeats(f));
+                } else {
+                    // If seat count doesn't match expected (old layout had fewer columns), rebuild
+                    List<com.airline.reservation.entity.Seat> existing = seatRepository.findByFlightId(f.getId());
+                    int expectedCount = 4 * 4 + 16 * 6; // 4 bus rows x 4 cols + 16 eco rows x 6 cols = 112
+                    if (existing.size() < expectedCount) {
+                        seatRepository.saveAll(buildSeats(f));
+                    }
                 }
 
                 FlightResponse r = toResponse(f);
