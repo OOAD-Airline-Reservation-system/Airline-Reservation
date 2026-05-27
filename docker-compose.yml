@@ -1,0 +1,42 @@
+version: '3.8'
+
+services:
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: ars_backend
+    ports:
+      - "8080:8080"
+    environment:
+      # These variables override the application.yml values at runtime
+      - APP_JWT_SECRET=${APP_JWT_SECRET}
+      - FIREBASE_PROJECT_ID=${FIREBASE_PROJECT_ID}
+      - AVIATIONSTACK_API_KEY=${AVIATIONSTACK_API_KEY}
+      - GEMINI_API_KEY=${GEMINI_API_KEY}
+    networks:
+      - ars_network
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+      args:
+        # Pass Vite env variables into the build stage
+        - VITE_FIREBASE_API_KEY=${VITE_FIREBASE_API_KEY}
+        - VITE_FIREBASE_AUTH_DOMAIN=${VITE_FIREBASE_AUTH_DOMAIN}
+        - VITE_FIREBASE_PROJECT_ID=${VITE_FIREBASE_PROJECT_ID}
+        - VITE_FIREBASE_STORAGE_BUCKET=${VITE_FIREBASE_STORAGE_BUCKET}
+        - VITE_FIREBASE_MESSAGING_SENDER_ID=${VITE_FIREBASE_MESSAGING_SENDER_ID}
+        - VITE_FIREBASE_APP_ID=${VITE_FIREBASE_APP_ID}
+    container_name: ars_frontend
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
+    networks:
+      - ars_network
+
+networks:
+  ars_network:
+    driver: bridge
