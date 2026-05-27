@@ -526,6 +526,8 @@ The `vite.config.js` file already contains a proxy rule that forwards all `/api/
 | Frontend cannot reach backend | Backend not running or wrong port | Ensure backend is running on port 8080 before starting the frontend |
 | `npm install` fails | Node.js version below 18 | Upgrade Node.js at https://nodejs.org |
 
+---
+
 ### Alternative Setup: Run using Docker
 
 If you prefer to run the application using Docker, ensuring isolated environments without manually installing Node or Maven, follow these steps.
@@ -565,7 +567,6 @@ Once the containers are built and running, the application will be accessible at
 
 - Frontend: `http://localhost`
 - Backend API: `http://localhost:8080` (Proxied automatically via Nginx on port 80)
----
 
 ---
 
