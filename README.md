@@ -525,7 +525,46 @@ The `vite.config.js` file already contains a proxy rule that forwards all `/api/
 | Gemini suggestions fail | Gemini API key missing or quota exceeded | Add your key to `application.yml`; check quota at [aistudio.google.com](https://aistudio.google.com) |
 | Frontend cannot reach backend | Backend not running or wrong port | Ensure backend is running on port 8080 before starting the frontend |
 | `npm install` fails | Node.js version below 18 | Upgrade Node.js at https://nodejs.org |
- 
+
+### Alternative Setup: Run using Docker
+
+If you prefer to run the application using Docker, ensuring isolated environments without manually installing Node or Maven, follow these steps.
+
+**Prerequisites:**
+- Docker and Docker Compose installed on your machine.
+
+#### Step 1 — Create the Environment File
+
+In the root directory of the project (next to `docker-compose.yml`), create a `.env` file and populate it with your keys (obtained in Steps 2 and 3 above):
+
+```env
+APP_JWT_SECRET=your-base64-encoded-256-bit-secret
+FIREBASE_PROJECT_ID=your-firebase-project-id
+AVIATIONSTACK_API_KEY=your-aviationstack-access-key
+GEMINI_API_KEY=your-gemini-api-key
+
+VITE_FIREBASE_API_KEY=your-firebase-api-key
+VITE_FIREBASE_AUTH_DOMAIN=your-project.firebaseapp.com
+VITE_FIREBASE_PROJECT_ID=your-firebase-project-id
+VITE_FIREBASE_STORAGE_BUCKET=your-project.appspot.com
+VITE_FIREBASE_MESSAGING_SENDER_ID=your-sender-id
+VITE_FIREBASE_APP_ID=your-app-id
+```
+
+#### Step 2 — Build and Run the Containers
+
+Open your terminal in the root directory and execute:
+
+```bash
+docker-compose up --build -d
+```
+
+#### Step 3 — Access the Application
+
+Once the containers are built and running, the application will be accessible at:
+
+- Frontend: `http://localhost`
+- Backend API: `http://localhost:8080` (Proxied automatically via Nginx on port 80)
 ---
 
 ---
